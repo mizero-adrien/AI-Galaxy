@@ -1,0 +1,21 @@
+/* src/index.css */
+@import "tailwindcss";
+
+/* optional global styles */
+/*body {*/
+/*  @apply dark:bg-gray-900 text-gray-900 dark:text-gray-100;*/
+
+/*  @apply bg-white text-gray-900;*/
+
+/*}*/
+
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+  animation: scroll 20s linear infinite;
+}
+

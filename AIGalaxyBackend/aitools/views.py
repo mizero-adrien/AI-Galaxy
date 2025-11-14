@@ -6,30 +6,42 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import login
 from rest_framework import viewsets, status
-from .models import CustomUser, AITool, AIUsage, Subscription, Donation,Category
-from .serializers import UserSerializer, UserSignUpSerializer, UserLoginSerializer, AIToolSerializer,AIUsageSerializer,SubscriptionSerializer,DonationSerializer,CategorySerializer
+from .models import CustomUser, AITool, AIUsage, Subscription, Donation,Category, ContactMessage
+from .serializers import UserSerializer, UserSignUpSerializer, UserLoginSerializer, AIToolSerializer,AIUsageSerializer,SubscriptionSerializer,DonationSerializer,CategorySerializer, ContactMessageSerializer
 
 
-
+class ContactMessageViewSet(viewsets.ModelViewSet):
+    queryset = ContactMessage.objects.all().order_by("-created_at")
+    serializer_class = ContactMessageSerializer
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
-    serializer_classes = UserSerializer
+    serializer_class = UserSerializer
 
     # Signup
-    @action(detail=False, methods=['posts'], permission_classes=[AllowAny])
+    @action(
+        detail=False,
+        methods=['post'],
+        permission_classes=[AllowAny],
+        authentication_classes=[]
+    )
     def signup(self, request):
         serializer = UserSignUpSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             return Response(
-                {'message': 'User registered successfully', 'User': UserSerializer(user).data},
+                {'message': 'User registered successfully', 'user': UserSerializer(user).data},
                 status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    @action(
+        detail=False,
+        methods=['post'],
+        permission_classes=[AllowAny],
+        authentication_classes=[]
+    )
     def login(self, request):
-        serializer = UserLoginSerializer(data=request.data)
+        serializer = UserLoginSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             user = serializer.validated_data['user']
             login(request, user)
@@ -48,6 +60,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AllowAny]  # public access
+    lookup_field = 'slug'
 
     # Optional: Custom action to list all tools in a category
     @action(detail=True, methods=['get'], permission_classes=[AllowAny])

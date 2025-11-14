@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, Category, AITool, AIUsage, Subscription, Donation
+from .models import CustomUser, Category, AITool, AIUsage, Subscription, Donation, ContactMessage
 
 
 @admin.register(CustomUser)
@@ -54,4 +54,11 @@ class DonationAdmin(admin.ModelAdmin):
     list_filter = ('payment_method', 'completed')
     search_fields = ('user__email', 'message')
     ordering = ('-created_at',)
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ("firstName", "lastName", "email", "country", "is_human","message", "created_at",)
+    list_filter = ("is_human", "country", "created_at")
+    search_fields = ("firstName", "lastName", "email", "message")
+    readonly_fields = ("created_at",)
 

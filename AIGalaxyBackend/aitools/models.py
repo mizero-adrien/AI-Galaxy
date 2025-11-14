@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 
 class CustomUser(AbstractUser):
@@ -57,7 +58,7 @@ class Subscription(models.Model):
     def __str__(self):
         return f"{self.user.name} - {self.plan_name}"
 
-from django.conf import settings
+
 
 class Donation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
@@ -69,5 +70,21 @@ class Donation(models.Model):
 
     def __str__(self):
         return f"{self.user} donated {self.amount}"
+
+class ContactMessage(models.Model):
+    firstName = models.CharField(max_length=150)
+    lastName = models.CharField(max_length=150)
+    email = models.EmailField()
+    country = models.CharField(max_length=100, blank=True, null=True)
+    message = models.TextField()
+    is_human = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return f"{self.firstName} {self.lastName} <{self.email}>"
+
 
 

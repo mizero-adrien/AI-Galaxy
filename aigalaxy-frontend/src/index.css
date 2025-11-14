@@ -1,21 +1,51 @@
 /* src/index.css */
 @import "tailwindcss";
 
-/* optional global styles */
-/*body {*/
-/*  @apply dark:bg-gray-900 text-gray-900 dark:text-gray-100;*/
+/* Scrollbar styling for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
 
-/*  @apply bg-white text-gray-900;*/
+::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-/*}*/
+::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 4px;
+}
 
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
 
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Animation for scrolling tools */
 @keyframes scroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 
 .animate-scroll {
-  animation: scroll 20s linear infinite;
+  animation: scroll 40s linear infinite;
+}
+
+/* Prevent horizontal scroll on mobile */
+body {
+  overflow-x: hidden;
 }
 

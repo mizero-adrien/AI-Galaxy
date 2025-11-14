@@ -6,6 +6,7 @@ from .views import (
     AIUsageViewSet,
     SubscriptionViewSet,
     DonationViewSet, CategoryViewSet,
+ContactMessageViewSet
 )
 
 # Create a router and register all viewsets
@@ -16,6 +17,7 @@ router.register(r'usage', AIUsageViewSet, basename='usage')
 router.register(r'subscriptions', SubscriptionViewSet, basename='subscriptions')
 router.register(r'donations', DonationViewSet, basename='donations')
 router.register(r'categories', CategoryViewSet, basename='categories')
+router.register("contact", ContactMessageViewSet, basename="contact")
 
 urlpatterns = [
     path('', include(router.urls)),

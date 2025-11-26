@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, Category, AITool, AIUsage, Subscription, Donation, ContactMessage
+from .models import CustomUser, Category, AITool, AIUsage, Subscription, Donation, ContactMessage, BlogPost, BlogLike, BlogComment
 
 
 @admin.register(CustomUser)
@@ -12,14 +12,15 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug')
+    list_display = ('name', 'slug', 'is_popular')
     search_fields = ('name',)
+    list_filter = ('is_popular',)
     prepopulated_fields = {'slug': ('name',)}  # auto-generate slug from name
 
 
 @admin.register(AITool)
 class AIToolAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'is_premium','image', 'created_at')
+    list_display = ('name', 'category', 'is_premium','image','link','is_popular','is_free', 'created_at')
     list_filter = ('category', 'is_premium')
     search_fields = ('name', 'description')
     ordering = ('-created_at',)
@@ -61,4 +62,36 @@ class ContactMessageAdmin(admin.ModelAdmin):
     list_filter = ("is_human", "country", "created_at")
     search_fields = ("firstName", "lastName", "email", "message")
     readonly_fields = ("created_at",)
+
+
+@admin.register(BlogPost)
+class BlogPostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'is_published', 'created_at', 'like_count', 'comment_count')
+    list_filter = ('is_published', 'created_at')
+    search_fields = ('title', 'content', 'author__username', 'author__email')
+    readonly_fields = ('created_at', 'updated_at', 'like_count', 'comment_count')
+    prepopulated_fields = {'excerpt': ('title',)}
+
+    def like_count(self, obj):
+        return obj.like_count
+    like_count.short_description = 'Likes'
+
+    def comment_count(self, obj):
+        return obj.comment_count
+    comment_count.short_description = 'Comments'
+
+
+@admin.register(BlogLike)
+class BlogLikeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'post', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username', 'user__email', 'post__title')
+
+
+@admin.register(BlogComment)
+class BlogCommentAdmin(admin.ModelAdmin):
+    list_display = ('user', 'post', 'created_at', 'updated_at')
+    list_filter = ('created_at', 'updated_at')
+    search_fields = ('user__username', 'user__email', 'post__title', 'content')
+    readonly_fields = ('created_at', 'updated_at')
 

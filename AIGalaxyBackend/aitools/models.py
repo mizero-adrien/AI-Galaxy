@@ -17,6 +17,7 @@ class Category(models.Model):
     name = models.CharField(max_length=100, unique=True,default='')
     slug = models.SlugField(max_length=100, unique=True,default='')
     description = models.TextField(blank=True, null=True,default='')
+    is_popular = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "Categories"
@@ -32,6 +33,9 @@ class AITool(models.Model):
     is_premium = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to='aitools', blank=True, null=True)
+    is_popular =models.BooleanField(default=False)
+    is_free = models.BooleanField(default=True)
+    link = models.URLField(blank=True, null=True)
 
 
     def __str__(self):
@@ -85,6 +89,71 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"{self.firstName} {self.lastName} <{self.email}>"
+
+
+class UserFavorite(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='favorites')
+    tool = models.ForeignKey(AITool, on_delete=models.CASCADE, related_name='favorited_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'tool']  # Prevent duplicate favorites
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.tool.name}"
+
+
+class BlogPost(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='blog_posts')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    image = models.ImageField(upload_to='blog', blank=True, null=True)
+    excerpt = models.TextField(max_length=500, blank=True, null=True)
+    is_published = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def like_count(self):
+        return self.likes.count()
+
+    @property
+    def comment_count(self):
+        return self.comments.count()
+
+
+class BlogLike(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='blog_likes')
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'post']  # Prevent duplicate likes
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} liked {self.post.title}"
+
+
+class BlogComment(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='blog_comments')
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='comments')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} commented on {self.post.title}"
 
 
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+// import CategoriesDetail from './CategoryDetail';
 
 interface Category {
   id: number;
@@ -20,7 +21,7 @@ const CategoriesPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+        const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
         const response = await axios.get(`${baseURL}/api/categories/`);
         // Handle paginated response (DRF returns {results: [...]}) or direct array
         const categoriesData = Array.isArray(response.data) 

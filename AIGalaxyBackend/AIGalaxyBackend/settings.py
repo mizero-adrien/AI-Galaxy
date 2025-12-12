@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-nvyi++xd)u=02@_cf_-a%j%a9d=fgrtq^74b4%0l&v9m_38d_q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
 
 
 # Application definition
@@ -52,6 +52,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+# Disable CSRF for API endpoints (handled by CORS)
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:3002',
+    'http://127.0.0.1:3002',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
 ]
 
 ROOT_URLCONF = 'AIGalaxyBackend.urls'
@@ -134,7 +144,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+        'aitools.authentication.CsrfExemptSessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -144,18 +154,65 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 12,
 }
 AUTH_USER_MODEL = 'aitools.CustomUser'
+
+# CORS Configuration
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'cache-control',
+    'pragma',
+]
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
 import os
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Specific CORS origins (backup if CORS_ALLOW_ALL_ORIGINS is False)
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:3002",
+    "http://127.0.0.1:3002",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
 
+# Firebase Admin SDK Initialization (optional)
+try:
+    import firebase_admin
+    from firebase_admin import credentials
+    from pathlib import Path
+    
+    FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, '../ai-galaxy-54fea-firebase-adminsdk-fbsvc-727c2fcbe4.json')
+    
+    if os.path.exists(FIREBASE_CREDENTIALS_PATH):
+        cred = credentials.Certificate(FIREBASE_CREDENTIALS_PATH)
+        firebase_admin.initialize_app(cred)
+        print("Firebase Admin SDK initialized successfully")
+    else:
+        print("Firebase credentials file not found. Firebase Admin SDK not initialized.")
+except ImportError:
+    print("firebase_admin not installed. Firebase Admin SDK not initialized.")
+except Exception as e:
+    print(f"Error initializing Firebase Admin SDK: {e}")
+    print("Warning: Firebase Admin SDK credentials not found")
 
 

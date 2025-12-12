@@ -1,8 +1,8 @@
 // src/types/auth.types.ts
 export interface SignupData {
-  username: string;
   email: string;
   password: string;
+  username?: string; // Optional, will be auto-generated from email if not provided
 }
 
 export interface LoginData {

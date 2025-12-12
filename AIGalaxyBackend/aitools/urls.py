@@ -5,9 +5,15 @@ from .views import (
     AiToolViewSet,
     AIUsageViewSet,
     SubscriptionViewSet,
-    DonationViewSet, CategoryViewSet,
-    ContactMessageViewSet, UserFavoriteViewSet,
-    BlogPostViewSet, BlogCommentViewSet
+    DonationViewSet,
+    CategoryViewSet,
+    ContactMessageViewSet,
+    ToolRatingViewSet,
+    UserFavoriteViewSet,
+    NewsletterSubscriberViewSet,
+    ToolSubmissionViewSet,
+    BlogPostViewSet,
+    CommentViewSet
 )
 
 # Create a router and register all viewsets
@@ -19,10 +25,13 @@ router.register(r'usage', AIUsageViewSet, basename='usage')
 router.register(r'subscriptions', SubscriptionViewSet, basename='subscriptions')
 router.register(r'donations', DonationViewSet, basename='donations')
 router.register(r'categories', CategoryViewSet, basename='categories')
-router.register("contact", ContactMessageViewSet, basename="contact")
+router.register(r'contact', ContactMessageViewSet, basename='contact')
+router.register(r'tool-ratings', ToolRatingViewSet, basename='tool-ratings')
 router.register(r'favorites', UserFavoriteViewSet, basename='favorites')
-router.register(r'blog/posts', BlogPostViewSet, basename='blogposts')
-router.register(r'blog/comments', BlogCommentViewSet, basename='blogcomments')
+router.register(r'newsletter', NewsletterSubscriberViewSet, basename='newsletter')
+router.register(r'submit-tool', ToolSubmissionViewSet, basename='submit-tool')
+router.register(r'blog', BlogPostViewSet, basename='blog')
+router.register(r'comments', CommentViewSet, basename='comments')
 
 urlpatterns = [
     path('', include(router.urls)),

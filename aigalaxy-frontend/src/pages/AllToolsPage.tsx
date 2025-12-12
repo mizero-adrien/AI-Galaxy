@@ -14,7 +14,7 @@ const AllToolsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+  const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const getImageUrl = (imagePath: string | null | undefined) => {
     if (!imagePath) return "/fallback.png";
@@ -26,8 +26,13 @@ const AllToolsPage: React.FC = () => {
     const fetchTools = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${baseURL}/api/aitools/`);
-        setTools(response.data);
+        const response = await axios.get(`${baseURL}/api/ai-tools/`);
+        const toolsData = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data.results)
+          ? response.data.results
+          : [];
+        setTools(toolsData);
       } catch (err) {
         console.error(err);
         setError("Failed to load tools. Try again later.");
@@ -53,7 +58,7 @@ const AllToolsPage: React.FC = () => {
             No tools available at the moment.
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {tools.map((tool) => (
               <div
                 key={tool.id}

@@ -18,8 +18,29 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+
+@require_http_methods(["GET"])
+def api_root(request):
+    """Simple API root endpoint"""
+    return JsonResponse({
+        'message': 'AI Galaxy Backend API',
+        'version': '1.0.0',
+        'endpoints': {
+            'admin': '/admin/',
+            'api_root': '/api/',
+            'categories': '/api/categories/',
+            'ai_tools': '/api/ai-tools/',
+            'users': '/api/users/',
+            'contact': '/api/contact/',
+            'favorites': '/api/favorites/',
+            'blog_posts': '/api/blog/posts/',
+        }
+    })
 
 urlpatterns = [
+    path('', api_root, name='api_root'),
     path('admin/', admin.site.urls),
     path('api/', include('aitools.urls')),
 ]

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import { ArrowUpRightIcon } from "@heroicons/react/24/outline";
+import ToolCard from "../Components/ToolCard";
 import About from "./About";
+import Trending from "../Components/Trending";
 
 interface Category {
   id: number;
@@ -17,6 +19,8 @@ interface Tool {
   description: string;
   image: string;
   category: Category | number;
+  is_premium: boolean;
+  link?: string;
 }
 
 
@@ -25,7 +29,7 @@ const Home: React.FC = () => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [search, setSearch] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
-  const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+  const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   // Helper function to construct full image URL
   const getImageUrl = (imagePath: string | null | undefined): string => {
@@ -41,7 +45,7 @@ const Home: React.FC = () => {
         setLoading(true);
         const [catRes, toolRes] = await Promise.all([
           axios.get(`${baseURL}/api/categories/`, { params: { page_size: 9 } }),
-          axios.get(`${baseURL}/api/ai-tools/`, { params: { page_size: 20 } }),
+          axios.get(`${baseURL}/api/ai-tools/`, { params: { page_size: 20, is_popular: true } }),
         ]);
         // Handle paginated response (DRF returns {results: [...]}) or direct array
         const categoriesData = Array.isArray(catRes.data) 
@@ -87,15 +91,15 @@ const Home: React.FC = () => {
   const limitedCategories = categories.slice(0, 9);
 
   return (
-    <div className="flex flex-col bg-gray-50 dark:bg-gray-950 min-h-screen text-gray-900 dark:text-gray-100 overflow-x-hidden transition-colors duration-300">
+    <div className="flex flex-col bg-gray-50  min-h-screen text-gray-900  overflow-x-hidden transition-colors duration-300">
       {/* MAIN CONTENT WRAPPER */}
       <div className="flex-1">
         {/* HERO SECTION */}
         <section
             className="relative h-[50vh] sm:h-[60vh] flex flex-col justify-center items-center text-white ">
           <video
-              className="absolute top-0 left-0 w-full h-full object-cover"
-              src="/fdoot-vid2.mp4"
+              className="absolute top-0 left-0 w-full h-40 object-cover"
+              src="/Neural_Network_Animation_Generated.mp4"
               autoPlay
               loop
               muted
@@ -142,7 +146,7 @@ const Home: React.FC = () => {
                 [...limitedTools, ...limitedTools].map((tool, index) => (
                     <Link
                         key={`${tool.id}-${index}`}
-                        to={`/tools/${tool.id}`} // <- link each logo
+                        href={`/tools/${tool.id}`} // <- CHANGED: to → href
                         className="flex items-center space-x-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 sm:px-6 py-3 shadow-sm hover:shadow-md transition-all min-w-fit"
                     >
                       <img
@@ -194,27 +198,7 @@ const Home: React.FC = () => {
                 </p>
             ) : limitedTools.length > 0 ? (
                 limitedTools.map((tool) => (
-                    <Link
-                        key={tool.id}
-                        to={`/tools/${tool.id}`}
-                        className="bg-gray-100 dark:bg-gray-800 hover:scale-105 transition-all duration-300 rounded-xl shadow-md p-4 border border-gray-200 dark:border-gray-700"
-                    >
-                      <div className="flex items-center justify-center mb-3">
-                        <img
-                            src={getImageUrl(tool.image)}
-                            alt={tool.name}
-                            className="h-10 sm:h-12 object-contain"
-                        />
-                      </div>
-                      <h3 className="text-base sm:text-lg font-semibold text-center mb-2 text-gray-900 dark:text-gray-100">
-                        {tool.name}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center line-clamp-3">
-                        {tool.description
-                            ? tool.description.split(" ").slice(0, 15).join(" ") + "..."
-                            : "No description available."}
-                      </p>
-                    </Link>
+                    <ToolCard key={tool.id} tool={tool} />
                 ))
             ) : (
                 <p className="text-center text-gray-500 dark:text-gray-400 w-full col-span-full">
@@ -247,7 +231,7 @@ const Home: React.FC = () => {
                           className="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-6 hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
                       >
                         <Link
-                          to={`/categories/${category.slug}`}
+                          href={`/categories/${category.slug}`} // <- CHANGED: to → href
                           className="inline-flex items-center justify-between w-full gap-3 mb-4 group"
                         >
                           <h3 className="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 group-hover:underline">
@@ -259,7 +243,7 @@ const Home: React.FC = () => {
                           {toolsInCategory.slice(0, 5).map((tool) => (
                               <li key={tool.id}>
                                 <Link
-                                    to={`/tools/${tool.id}`}
+                                    href={`/tools/${tool.id}`} // <- CHANGED: to → href
                                     className="hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
                                 >
                                   {tool.name}
@@ -270,7 +254,7 @@ const Home: React.FC = () => {
                         {toolsInCategory.length > 5 && (
                           <div className="mt-4">
                             <Link
-                              to={`/categories/${category.slug}`}
+                              href={`/categories/${category.slug}`} // <- CHANGED: to → href
                               className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:underline"
                             >
                               More tools
@@ -285,8 +269,10 @@ const Home: React.FC = () => {
           </div>
         </section>
 
+         <Trending/>
         {/* ABOUT */}
         <About/>
+
       </div>
     </div>
   );

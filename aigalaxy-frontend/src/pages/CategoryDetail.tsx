@@ -22,7 +22,7 @@ const CategoryDetail: React.FC = () => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+  const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const getImageUrl = (imagePath: string | null | undefined): string => {
     if (!imagePath) return "/fallback.png";

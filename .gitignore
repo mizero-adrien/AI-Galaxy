@@ -70,6 +70,7 @@ web_modules/
 .env.*
 !.env.example
 .env.local
+.env.local.example
 .env.development.local
 .env.test.local
 .env.production.local
